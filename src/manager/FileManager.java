@@ -17,11 +17,16 @@ public class FileManager {
     private File rootDirectory;
     private String claimDirectoryPath;
 
-    public FileManager(String rootDirectoryString) {
+    public FileManager(String rootDirectoryString) { // Remove the parameter from this constructor after completing the comments below
         rootDirectory = new File(rootDirectoryString);
         imgFileTypes = new ArrayList<>();
         fileQueue = new ArrayList<>();
         pictureQueue = new ArrayList<>();
+
+        if(!initializeRootDirectory()) { // This will get the root directory from a text file in the AppData folder.
+            // This will execute if the method returns false because the text file was not found.
+            setRootDirectory();
+        }
 
         imgFileTypes.add(".png");
         imgFileTypes.add(".jpeg");
@@ -29,6 +34,27 @@ public class FileManager {
         imgFileTypes.add(".gif");
         imgFileTypes.add(".tiff");
         imgFileTypes.add(".bmp");
+    }
+
+
+    public boolean initializeRootDirectory() {
+        // Use System to get user AppData folder.
+        // Does /AppData/AAGFileManager/ exist? If not, create it
+        // Does /AppData/AAGFileManager/rootdir.txt exist?
+            // If not, this is the first run.
+            // Return false.
+            return false;
+
+            // If so, read the first line of text and set that to this.rootDirectory
+        // return true;
+
+    }
+
+    public void setRootDirectory() {
+        // Prompt user to select the root directory, bring up a file explorer to select the folder.
+        // Create /AppData/AAGFileManager/rootdir.txt
+        // Write the folder path the user selected in the txt file as plain text.
+        initializeRootDirectory(); // Call this and let it do its thing
     }
 
 
