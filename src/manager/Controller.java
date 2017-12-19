@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-
 public class Controller {
 
     @FXML
@@ -93,9 +92,7 @@ public class Controller {
                     ButtonType.OK);
             requiredFieldsEmptyAlert.showAndWait();
         }
-
     }
-
 
     @FXML
     void populateDamageTypes(MouseEvent mouseEvent) {
@@ -144,6 +141,4 @@ public class Controller {
     void exit(ActionEvent actionEvent) {
         System.exit(0);
     }
-
-
 }
