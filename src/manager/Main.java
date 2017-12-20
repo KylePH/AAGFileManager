@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.stage.Stage;
@@ -26,6 +27,7 @@ public class Main extends Application {
             }
         });
 
+        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("images\\logo.png")));
         primaryStage.setTitle("AAG Filer");
         primaryStage.setScene(new Scene(init, 400, 300));
         primaryStage.show();
