@@ -20,7 +20,7 @@ public class FileManager {
     private ArrayList<String> imgFileTypes;
     private ArrayList<File> fileQueue;
     private ArrayList<File> pictureQueue;
-    private File caseDirectory;
+    private File claimDirectory;
     private File aagDataFolder;
     private String claimDirectoryPath;
     private String slash;
@@ -42,7 +42,7 @@ public class FileManager {
             slash = "/";
         }
 
-        parseCaseDirectory();
+        parseClaimDirectory();
 
         imgFileTypes.add(".png");
         imgFileTypes.add(".jpeg");
@@ -53,14 +53,14 @@ public class FileManager {
     }
 
     /**
-     * Reads the path to the root working directory for AAG cases from
+     * Reads the path to the root working directory for AAG claims from
      * a text file located in the AppData/Roaming/AAGFileManager folder.
      * If the folder does not exist, this method creates it.
-     * If the text file does not exist, this method calls setCaseDirectory(),
+     * If the text file does not exist, this method calls setClaimDirectory(),
      * which then makes the text file and prompts the user to select the
      * root working directory.
      */
-    public void parseCaseDirectory() {
+    public void parseClaimDirectory() {
         // Use System to get user AppData folder.
         // Made compatible with MacOS for testing on my MacBook.
         if(isWindows) {
@@ -79,26 +79,26 @@ public class FileManager {
         if(rootDirTextFile.toFile().exists() && rootDirTextFile.toFile().isFile() && !rootDirTextFile.toFile().isDirectory()) {
             try {
                 List<String> lines = Files.readAllLines(rootDirTextFile);
-                this.caseDirectory = new File(lines.get(0)); // set this.caseDirectory
+                this.claimDirectory = new File(lines.get(0)); // set this.claimDirectory
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         } else { // Doesn't exist? Set it.
-            initializeCaseDirectory();
+            initializeClaimDirectory();
         }
     }
 
     /**
      * This method is only called on the first time this program is executed.
      * This will prompt the user to select the folder of the root working
-     * directory that AAG cases are stored. It will then make a text file in
+     * directory that AAG claims are stored. It will then make a text file in
      * the AppData/Local/Roaming
      */
-    public void initializeCaseDirectory() {
+    public void initializeClaimDirectory() {
         // Prompt user to select the root directory, bring up a file explorer to select the folder.
         DirectoryChooser directoryChooser = new DirectoryChooser();
-        directoryChooser.setTitle("Select working folder for AAG cases");
+        directoryChooser.setTitle("Select working folder for AAG claims");
         if(isWindows) {
             directoryChooser.setInitialDirectory(new File("C:\\"));
         } else {
@@ -108,14 +108,14 @@ public class FileManager {
         File directory = directoryChooser.showDialog(new Stage());
 
         if(directory == null) {
-            Alert caseDirectoryMissingAlert = new Alert(Alert.AlertType.CONFIRMATION,
-                    "You have not specified the folder for your case files.\nPress OK to choose the folder.\n"
+            Alert claimDirectoryMissingAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "You have not specified the folder for your claim files.\nPress OK to choose the folder.\n"
                             + "Press Cancel to do it later.",
                     ButtonType.OK,
                     ButtonType.CANCEL);
-            caseDirectoryMissingAlert.showAndWait();
-            if (caseDirectoryMissingAlert.getResult() == ButtonType.OK) {
-                initializeCaseDirectory();
+            claimDirectoryMissingAlert.showAndWait();
+            if (claimDirectoryMissingAlert.getResult() == ButtonType.OK) {
+                initializeClaimDirectory();
             }
             return;
         }
@@ -132,21 +132,21 @@ public class FileManager {
         }
 
         if(writtenFile != null) {
-            parseCaseDirectory(); // Call this and let it do its thing
+            parseClaimDirectory(); // Call this and let it do its thing
         } else {
             if(isWindows) {
-                System.out.println("File write failed... Defaulting case directory to C:\\");
-                this.caseDirectory = new File("C:\\");
+                System.out.println("File write failed... Defaulting claim directory to C:\\");
+                this.claimDirectory = new File("C:\\");
             } else {
-                System.out.println("File write failed... Defaulting case directory to ~/user/home");
-                this.caseDirectory = new File(System.getProperty("user.home"));
+                System.out.println("File write failed... Defaulting claim directory to ~/user/home");
+                this.claimDirectory = new File(System.getProperty("user.home"));
             }
         }
     }
 
 
     /**
-     * Creates the special directory for the case files to be added to.
+     * Creates the special directory for the claim files to be added to.
      * True if the directory was created.
      * False if the directory already exists.
      * @param firstName
@@ -157,9 +157,9 @@ public class FileManager {
      * @throws IOException
      */
     public boolean createFileDirectory(String firstName, String lastName, String date, String aagNumber) throws IOException {
-        if (caseDirectory != null && caseDirectory.exists() && caseDirectory.isDirectory()) {
+        if (claimDirectory != null && claimDirectory.exists() && claimDirectory.isDirectory()) {
 
-            File claimDirectory = new File(caseDirectory.getPath() + "\\" +
+            File claimDirectory = new File(this.claimDirectory.getPath() + "\\" +
                     lastName + " " + firstName + " " + date + " AAG " + aagNumber);
 
             claimDirectoryPath = claimDirectory.getPath();
@@ -169,13 +169,13 @@ public class FileManager {
                 return true;
             }
         } else {
-            Alert caseDirectoryMissingAlert = new Alert(Alert.AlertType.CONFIRMATION,
-                    "You have not specified the folder for your case files. Press OK to choose the folder.",
+            Alert claimDirectoryMissingAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "You have not specified the folder for your claim files. Press OK to choose the folder.",
                     ButtonType.OK,
                     ButtonType.CANCEL);
-            caseDirectoryMissingAlert.showAndWait();
-            if(caseDirectoryMissingAlert.getResult() == ButtonType.OK) {
-                initializeCaseDirectory();
+            claimDirectoryMissingAlert.showAndWait();
+            if(claimDirectoryMissingAlert.getResult() == ButtonType.OK) {
+                initializeClaimDirectory();
                 createFileDirectory(firstName, lastName, date, aagNumber);
             }
         }
@@ -304,8 +304,8 @@ public class FileManager {
      * Sets the rootDir, must be a File object.
      * @param rootDir
      */
-    public void setCaseDirectory(File rootDir) {
-        this.caseDirectory = rootDir;
+    public void setClaimDirectory(File rootDir) {
+        this.claimDirectory = rootDir;
     }
 
     /**
@@ -319,8 +319,8 @@ public class FileManager {
      * Returns the root directory as a File object.
      * @return
      */
-    public File getCaseDirectory() {
-        return caseDirectory;
+    public File getClaimDirectory() {
+        return claimDirectory;
     }
 
     /**

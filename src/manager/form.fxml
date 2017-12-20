@@ -24,7 +24,7 @@
             <MenuItem mnemonicParsing="false" onAction="#exit" text="Close"/>
         </Menu>
         <Menu mnemonicParsing="false" text="Edit">
-            <MenuItem mnemonicParsing="false" onAction="#setWorkingDirectory" text="Set Case Directory"/>
+            <MenuItem mnemonicParsing="false" onAction="#setWorkingDirectory" text="Set Claim Directory"/>
         </Menu>
     </MenuBar>
         <BorderPane onDragDropped="#handleDragDrop" prefHeight="277.0" prefWidth="400.0">
@@ -77,5 +77,5 @@
          <Pane prefHeight="16.0" prefWidth="400.0" BorderPane.alignment="CENTER" />
       </top>
         </BorderPane>
-    <TextField fx:id="status" alignment="CENTER" editable="false" opacity="0.5" prefHeight="18.0" prefWidth="400.0" text="Drag and drop case files and pictures into this program!"/>
+    <TextField fx:id="status" alignment="CENTER" editable="false" opacity="0.5" prefHeight="18.0" prefWidth="400.0" text="Drag and drop claim files and pictures into this program!"/>
 </VBox>

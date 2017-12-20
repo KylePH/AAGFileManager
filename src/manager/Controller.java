@@ -114,7 +114,7 @@ public class Controller {
     void chooseFiles() {
 
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select case files");
+        fileChooser.setTitle("Select claim files");
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(new Stage());
 
         if(selectedFiles != null) {
@@ -140,13 +140,13 @@ public class Controller {
 
     @FXML
     /**
-     * Called when the user clicks on "Set Case Directory" under the edit menu.
-     * Will call initializeCaseDirectory() in the FileManager class to set a new
-     * working directory for case files.
+     * Called when the user clicks on "Set Claim Directory" under the edit menu.
+     * Will call initializeClaimDirectory() in the FileManager class to set a new
+     * working directory for claim files.
      */
     void setWorkingDirectory() {
-        fileManager.initializeCaseDirectory();
-        status.setText("Set case directory to " + fileManager.getCaseDirectory());
+        fileManager.initializeClaimDirectory();
+        status.setText("Set claim directory to " + fileManager.getClaimDirectory());
     }
 
     @FXML
