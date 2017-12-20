@@ -214,17 +214,17 @@ class FileManager {
         if(pictureQueue.size() > 0 && fileQueue.size() > 0) {
             statusText = "Loaded "
                     + pictureQueue.size()
-                    + " pictures and "
+                    + " picture(s) and "
                     + fileQueue.size()
-                    + " other files successfully.";
+                    + " other file(s) successfully.";
         } else if (pictureQueue.size() > 0) {
             statusText = "Loaded "
                     + pictureQueue.size()
-                    + " pictures successfully.";
+                    + " picture(s) successfully.";
         } else if(fileQueue.size() > 0) {
             statusText = "Loaded "
                     + fileQueue.size()
-                    + " file successfully.";
+                    + " file(s) successfully.";
         } else {
             statusText = "No files loaded. Something went wrong.";
         }
