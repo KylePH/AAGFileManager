@@ -15,7 +15,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileManager {
+class FileManager {
 
     private ArrayList<String> imgFileTypes;
     private ArrayList<File> fileQueue;
@@ -26,7 +26,7 @@ public class FileManager {
     private String slash;
     private boolean isWindows;
 
-    public FileManager() { // Remove the parameter from this constructor after completing the comments below
+    FileManager() { // Remove the parameter from this constructor after completing the comments below
         imgFileTypes = new ArrayList<>();
         fileQueue = new ArrayList<>();
         pictureQueue = new ArrayList<>();
@@ -60,18 +60,13 @@ public class FileManager {
      * which then makes the text file and prompts the user to select the
      * root working directory.
      */
-    public void parseClaimDirectory() {
+    private void parseClaimDirectory() {
         // Use System to get user AppData folder.
         // Made compatible with MacOS for testing on my MacBook.
         if(isWindows) {
             aagDataFolder = new File(System.getenv("APPDATA") + "\\AAGFileManager");
         } else {
             aagDataFolder = new File(System.getProperty("user.home") + "/Library/Application Support/AAGFileManager");
-        }
-
-        // Does /AppData/Roaming/AAGFileManager/ exist? If not, create it
-        if(!aagDataFolder.exists()) {
-            aagDataFolder.mkdir();
         }
 
         // Does /AppData/Roaming/AAGFileManager/rootdir.txt exist? If yes, read it.
@@ -95,7 +90,7 @@ public class FileManager {
      * directory that AAG claims are stored. It will then make a text file in
      * the AppData/Local/Roaming
      */
-    public void initializeClaimDirectory() {
+    void initializeClaimDirectory() {
         // Prompt user to select the root directory, bring up a file explorer to select the folder.
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select working folder for AAG claims");
@@ -156,7 +151,7 @@ public class FileManager {
      * @return
      * @throws IOException
      */
-    public boolean createFileDirectory(String firstName, String lastName, String date, String aagNumber) throws IOException {
+    boolean createFileDirectory(String firstName, String lastName, String date, String aagNumber) throws IOException {
         if (claimDirectory != null && claimDirectory.exists() && claimDirectory.isDirectory()) {
 
             File claimDirectory = new File(this.claimDirectory.getPath() + "\\" +
@@ -208,7 +203,7 @@ public class FileManager {
                         added = true;
                     }
                 }
-                if(added == false) {
+                if(!added) {
                     fileQueue.add(file);
                 }
             }

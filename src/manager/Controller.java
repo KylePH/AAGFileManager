@@ -46,7 +46,7 @@ public class Controller {
     @FXML
     private TextField status;
 
-    FileManager fileManager = new FileManager();
+    private FileManager fileManager = new FileManager();
 
     final private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM.dd.yyyy");
 
@@ -72,7 +72,6 @@ public class Controller {
                             dateFormat.format(dateOfLoss.getValue()),
                             aagNumber.getText())) {
                         status.setText("Something went wrong while making the directory.");
-                        return;
                     }
                 }
             } else {
