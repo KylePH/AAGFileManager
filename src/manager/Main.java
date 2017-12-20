@@ -27,7 +27,7 @@ public class Main extends Application {
             }
         });
 
-        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("images\\logo.png")));
+        primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("..\\manager\\images\\logo.png")));
         primaryStage.setTitle("AAG Filer");
         primaryStage.setScene(new Scene(init, 400, 300));
         primaryStage.show();
