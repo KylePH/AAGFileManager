@@ -46,7 +46,7 @@ public class Controller {
     @FXML
     private TextField status;
 
-    FileManager fileManager = new FileManager("C:\\");
+    FileManager fileManager = new FileManager();
 
     final private DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM.dd.yyyy");
 

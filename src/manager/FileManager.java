@@ -16,12 +16,32 @@ public class FileManager {
     private ArrayList<File> pictureQueue;
     private File rootDirectory;
     private String claimDirectoryPath;
+    private String os;
+    private String slash;
 
-    public FileManager(String rootDirectoryString) { // Remove the parameter from this constructor after completing the comments below
-        rootDirectory = new File(rootDirectoryString);
+    public FileManager() { // Remove the parameter from this constructor after completing the comments below
         imgFileTypes = new ArrayList<>();
         fileQueue = new ArrayList<>();
         pictureQueue = new ArrayList<>();
+        String rootDirectoryString;
+
+        os = System.getProperty("os.name").toLowerCase();
+        switch(os) {
+            case "windows":
+                rootDirectoryString = "C:\\";
+                slash = "\\";
+                break;
+            case "mac":
+                rootDirectoryString = System.getProperty("user.home");
+                slash = "/";
+                break;
+            default:
+                rootDirectoryString = "C:\\";
+                slash = "\\";
+                break;
+        }
+
+        rootDirectory = new File(rootDirectoryString);
 
         if(!initializeRootDirectory()) { // This will get the root directory from a text file in the AppData folder.
             // This will execute if the method returns false because the text file was not found.
@@ -39,14 +59,35 @@ public class FileManager {
 
     public boolean initializeRootDirectory() {
         // Use System to get user AppData folder.
+        File aagDataFolder;
+        if(os.equals("windows")) {
+            aagDataFolder = new File(System.getenv("APPDATA") + "\\AAGFileManager");
+        } else {
+            aagDataFolder = new File(System.getProperty("user.home") + "/Library/Application Support/AAGFileManager");
+        }
+
         // Does /AppData/AAGFileManager/ exist? If not, create it
+        if(!aagDataFolder.exists()) {
+            aagDataFolder.mkdir();
+        }
+
         // Does /AppData/AAGFileManager/rootdir.txt exist?
+        File rootDirFile = new File(aagDataFolder.getAbsolutePath() + slash + "rootdir.txt");
+        if(!(rootDirFile.exists() && !rootDirFile.isDirectory())) {
+            try {
+                List<String> lines = Files.readAllLines(rootDirFile.toPath());
+                this.rootDirectory = new File(lines.get(0)); // set this.rootDirectory
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } else {
             // If not, this is the first run.
             // Return false.
             return false;
+        }
 
-            // If so, read the first line of text and set that to this.rootDirectory
-        // return true;
+        return true;
 
     }
 
