@@ -114,6 +114,7 @@ public class Controller {
     void chooseFiles() {
 
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select case files");
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(new Stage());
 
         if(selectedFiles != null) {
@@ -135,6 +136,17 @@ public class Controller {
         event.setDropCompleted(success);
         event.consume();
 
+    }
+
+    @FXML
+    /**
+     * Called when the user clicks on "Set Case Directory" under the edit menu.
+     * Will call initializeCaseDirectory() in the FileManager class to set a new
+     * working directory for case files.
+     */
+    void setWorkingDirectory() {
+        fileManager.initializeCaseDirectory();
+        status.setText("Set case directory to " + fileManager.getCaseDirectory());
     }
 
     @FXML

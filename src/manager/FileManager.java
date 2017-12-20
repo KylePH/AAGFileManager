@@ -1,11 +1,15 @@
 package manager;
 
 
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +18,8 @@ public class FileManager {
     private ArrayList<String> imgFileTypes;
     private ArrayList<File> fileQueue;
     private ArrayList<File> pictureQueue;
-    private File rootDirectory;
+    private File caseDirectory;
+    private File aagDataFolder;
     private String claimDirectoryPath;
     private String os;
     private String slash;
@@ -26,27 +31,25 @@ public class FileManager {
         String rootDirectoryString;
 
         os = System.getProperty("os.name").toLowerCase();
-        switch(os) {
-            case "windows":
+
+        switch(os) { // This is temporary until setCaseDirectory() is fully working.
+            case "windows 10":
+            case "windows 8.1":
+            case "windows 8":
+            case "windows 7":
+            case "windows xp":
                 rootDirectoryString = "C:\\";
                 slash = "\\";
                 break;
-            case "mac":
+            default:
                 rootDirectoryString = System.getProperty("user.home");
                 slash = "/";
                 break;
-            default:
-                rootDirectoryString = "C:\\";
-                slash = "\\";
-                break;
         }
 
-        rootDirectory = new File(rootDirectoryString);
+        caseDirectory = new File(rootDirectoryString); // Temporary until setCaseDirectory() is fully working.
 
-        if(!initializeRootDirectory()) { // This will get the root directory from a text file in the AppData folder.
-            // This will execute if the method returns false because the text file was not found.
-            setRootDirectory();
-        }
+        parseCaseDirectory();
 
         imgFileTypes.add(".png");
         imgFileTypes.add(".jpeg");
@@ -56,46 +59,74 @@ public class FileManager {
         imgFileTypes.add(".bmp");
     }
 
-
-    public boolean initializeRootDirectory() {
+    /**
+     * Reads the path to the root working directory for AAG cases from
+     * a text file located in the AppData/Roaming/AAGFileManager folder.
+     * If the folder does not exist, this method creates it.
+     * If the text file does not exist, this method calls setCaseDirectory(),
+     * which then makes the text file and prompts the user to select the
+     * root working directory.
+     */
+    public void parseCaseDirectory() {
         // Use System to get user AppData folder.
-        File aagDataFolder;
-        if(os.equals("windows")) {
+        // Added os specific folders so I can test on my MacBook.
+
+        if(os.startsWith("windows")) {
             aagDataFolder = new File(System.getenv("APPDATA") + "\\AAGFileManager");
         } else {
             aagDataFolder = new File(System.getProperty("user.home") + "/Library/Application Support/AAGFileManager");
         }
 
-        // Does /AppData/AAGFileManager/ exist? If not, create it
+        // Does /AppData/Roaming/AAGFileManager/ exist? If not, create it
         if(!aagDataFolder.exists()) {
             aagDataFolder.mkdir();
         }
 
-        // Does /AppData/AAGFileManager/rootdir.txt exist?
-        File rootDirFile = new File(aagDataFolder.getAbsolutePath() + slash + "rootdir.txt");
-        if(!(rootDirFile.exists() && !rootDirFile.isDirectory())) {
+        // Does /AppData/Roaming/AAGFileManager/rootdir.txt exist? If yes, read it.
+        Path rootDirTextFile = Paths.get(aagDataFolder.getAbsolutePath() + slash + "rootdir.txt");
+        if(rootDirTextFile.toFile().exists() && rootDirTextFile.toFile().isFile() && !rootDirTextFile.toFile().isDirectory()) {
             try {
-                List<String> lines = Files.readAllLines(rootDirFile.toPath());
-                this.rootDirectory = new File(lines.get(0)); // set this.rootDirectory
+                List<String> lines = Files.readAllLines(rootDirTextFile);
+                this.caseDirectory = new File(lines.get(0)); // set this.caseDirectory
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-        } else {
-            // If not, this is the first run.
-            // Return false.
-            return false;
+        } else { // Doesn't exist? Set it.
+            initializeCaseDirectory();
         }
-
-        return true;
-
     }
 
-    public void setRootDirectory() {
+    /**
+     * This method is only called on the first time this program is executed.
+     * This will prompt the user to select the folder of the root working
+     * directory that AAG cases are stored. It will then make a text file in
+     * the AppData/Local/Roaming
+     */
+    public void initializeCaseDirectory() {
         // Prompt user to select the root directory, bring up a file explorer to select the folder.
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Select working folder for AAG cases");
+        directoryChooser.setInitialDirectory(new File("C:\\"));
+        File directory = directoryChooser.showDialog(new Stage());
+
         // Create /AppData/AAGFileManager/rootdir.txt
+        Path rootDirTextFile = Paths.get(aagDataFolder.getAbsolutePath() + slash + "rootdir.txt");
+
         // Write the folder path the user selected in the txt file as plain text.
-        initializeRootDirectory(); // Call this and let it do its thing
+        Path writtenFile = null;
+        try {
+           writtenFile = Files.write(rootDirTextFile, directory.getAbsolutePath().getBytes(), StandardOpenOption.CREATE);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(writtenFile != null) {
+            parseCaseDirectory(); // Call this and let it do its thing
+        } else {
+            System.out.println("File write failed... Defaulting case directory to C://");
+            this.caseDirectory = new File("C:\\");
+        }
     }
 
 
@@ -111,9 +142,9 @@ public class FileManager {
      * @throws IOException
      */
     public boolean createFileDirectory(String firstName, String lastName, String date, String aagNumber) throws IOException {
-        if (rootDirectory.exists() && rootDirectory.isDirectory()) {
+        if (caseDirectory.exists() && caseDirectory.isDirectory()) {
 
-            File claimDirectory = new File(rootDirectory.getPath() + "\\" +
+            File claimDirectory = new File(caseDirectory.getPath() + "\\" +
                     lastName + " " + firstName + " " + date + " AAG " + aagNumber);
 
             claimDirectoryPath = claimDirectory.getPath();
@@ -214,7 +245,6 @@ public class FileManager {
                 pictureDir.mkdir();
             }
 
-
             for (int i = 0; i < pictureQueue.size(); ++i) {
 
                 File file = pictureQueue.get(i);
@@ -249,16 +279,16 @@ public class FileManager {
      * Sets the rootDir, must be a File object.
      * @param rootDir
      */
-    public void setRootDirectory(File rootDir) {
-        this.rootDirectory = rootDir;
+    public void setCaseDirectory(File rootDir) {
+        this.caseDirectory = rootDir;
     }
 
     /**
      * Returns the root directory as a File object.
      * @return
      */
-    public File getRootDirectory() {
-        return rootDirectory;
+    public File getCaseDirectory() {
+        return caseDirectory;
     }
 
     /**
