@@ -1,6 +1,8 @@
 package manager;
 
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -102,7 +104,21 @@ public class FileManager {
         } else {
             directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         }
+
         File directory = directoryChooser.showDialog(new Stage());
+
+        if(directory == null) {
+            Alert caseDirectoryMissingAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "You have not specified the folder for your case files.\nPress OK to choose the folder.\n"
+                            + "Press Cancel to do it later.",
+                    ButtonType.OK,
+                    ButtonType.CANCEL);
+            caseDirectoryMissingAlert.showAndWait();
+            if (caseDirectoryMissingAlert.getResult() == ButtonType.OK) {
+                initializeCaseDirectory();
+            }
+            return;
+        }
 
         // Create /AppData/AAGFileManager/rootdir.txt
         Path rootDirTextFile = Paths.get(aagDataFolder.getAbsolutePath() + slash + "rootdir.txt");
@@ -141,7 +157,7 @@ public class FileManager {
      * @throws IOException
      */
     public boolean createFileDirectory(String firstName, String lastName, String date, String aagNumber) throws IOException {
-        if (caseDirectory.exists() && caseDirectory.isDirectory()) {
+        if (caseDirectory != null && caseDirectory.exists() && caseDirectory.isDirectory()) {
 
             File claimDirectory = new File(caseDirectory.getPath() + "\\" +
                     lastName + " " + firstName + " " + date + " AAG " + aagNumber);
@@ -151,6 +167,16 @@ public class FileManager {
             if(!claimDirectory.exists()) {
                 claimDirectory.mkdir();
                 return true;
+            }
+        } else {
+            Alert caseDirectoryMissingAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "You have not specified the folder for your case files. Press OK to choose the folder.",
+                    ButtonType.OK,
+                    ButtonType.CANCEL);
+            caseDirectoryMissingAlert.showAndWait();
+            if(caseDirectoryMissingAlert.getResult() == ButtonType.OK) {
+                initializeCaseDirectory();
+                createFileDirectory(firstName, lastName, date, aagNumber);
             }
         }
         return false;
