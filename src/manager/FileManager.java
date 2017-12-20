@@ -21,33 +21,24 @@ public class FileManager {
     private File caseDirectory;
     private File aagDataFolder;
     private String claimDirectoryPath;
-    private String os;
     private String slash;
+    private boolean isWindows;
 
     public FileManager() { // Remove the parameter from this constructor after completing the comments below
         imgFileTypes = new ArrayList<>();
         fileQueue = new ArrayList<>();
         pictureQueue = new ArrayList<>();
-        String rootDirectoryString;
 
-        os = System.getProperty("os.name").toLowerCase();
+        // incorporate multi-platform support for testing on Windows and MacOS/Linux.
+        String os = System.getProperty("os.name").toLowerCase();
 
-        switch(os) { // This is temporary until setCaseDirectory() is fully working.
-            case "windows 10":
-            case "windows 8.1":
-            case "windows 8":
-            case "windows 7":
-            case "windows xp":
-                rootDirectoryString = "C:\\";
-                slash = "\\";
-                break;
-            default:
-                rootDirectoryString = System.getProperty("user.home");
-                slash = "/";
-                break;
+        if(os.startsWith("windows")) {
+            isWindows = true;
+            slash = "\\";
+        } else {
+            isWindows = false;
+            slash = "/";
         }
-
-        caseDirectory = new File(rootDirectoryString); // Temporary until setCaseDirectory() is fully working.
 
         parseCaseDirectory();
 
@@ -69,9 +60,8 @@ public class FileManager {
      */
     public void parseCaseDirectory() {
         // Use System to get user AppData folder.
-        // Added os specific folders so I can test on my MacBook.
-
-        if(os.startsWith("windows")) {
+        // Made compatible with MacOS for testing on my MacBook.
+        if(isWindows) {
             aagDataFolder = new File(System.getenv("APPDATA") + "\\AAGFileManager");
         } else {
             aagDataFolder = new File(System.getProperty("user.home") + "/Library/Application Support/AAGFileManager");
@@ -107,7 +97,11 @@ public class FileManager {
         // Prompt user to select the root directory, bring up a file explorer to select the folder.
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("Select working folder for AAG cases");
-        directoryChooser.setInitialDirectory(new File("C:\\"));
+        if(isWindows) {
+            directoryChooser.setInitialDirectory(new File("C:\\"));
+        } else {
+            directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        }
         File directory = directoryChooser.showDialog(new Stage());
 
         // Create /AppData/AAGFileManager/rootdir.txt
@@ -124,8 +118,13 @@ public class FileManager {
         if(writtenFile != null) {
             parseCaseDirectory(); // Call this and let it do its thing
         } else {
-            System.out.println("File write failed... Defaulting case directory to C://");
-            this.caseDirectory = new File("C:\\");
+            if(isWindows) {
+                System.out.println("File write failed... Defaulting case directory to C:\\");
+                this.caseDirectory = new File("C:\\");
+            } else {
+                System.out.println("File write failed... Defaulting case directory to ~/user/home");
+                this.caseDirectory = new File(System.getProperty("user.home"));
+            }
         }
     }
 
@@ -281,6 +280,13 @@ public class FileManager {
      */
     public void setCaseDirectory(File rootDir) {
         this.caseDirectory = rootDir;
+    }
+
+    /**
+     * @return whether or not the user is on Windows.
+     */
+    public boolean getIsWindows() {
+        return isWindows;
     }
 
     /**
